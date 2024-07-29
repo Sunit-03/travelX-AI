@@ -1,11 +1,29 @@
 import { Button } from '@/components/ui/button'
-import React from 'react'
+import { getPlaceDetails } from '@/service/GlobalAPI';
+import React, { useEffect, useState } from 'react'
 import { FaShareAlt } from "react-icons/fa";
 
+const PHOTO_URL = 'https://places.googleapis.com/v1/{NAME}/media?maxHeightPx=600&&maxWidthPx=800&key='+import.meta.env.VITE_GOOGLE_PLACE_API_KEY
 function InfoSection({trip}) {
+
+    const [photoUrl,setPhotoUrl]=useState()
+    useEffect(()=>{
+        trip&&getPlacePhoto()
+    },[trip])
+    const getPlacePhoto=async()=>{
+        const data={
+            textQuery:trip?.userSelection?.location?.label
+        }
+        const result = await getPlaceDetails(data).then(resp=>{
+            console.log(resp.data.places[0].photos[2].name)
+
+            const photoUrl=PHOTO_URL.replace('{NAME}',resp.data.places[0].photos[2].name)
+            setPhotoUrl(photoUrl)
+        })
+    }
   return (
     <div>
-        <img src="/placeholder.jpeg" className='justify-center h-[350px] w-[300px]' />
+        <img src={photoUrl?photoUrl:'/placeholder.jpeg'} className='justify-center object-cover' />
 
         <div className='flex items-center'>
             <div className='my-5 flex flex-col gap-2'>

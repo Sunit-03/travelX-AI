@@ -1,2 +1,0 @@
-ClientID: 639006827585-e92rdgf509q6dovcli89v6vdf07bachj.apps.googleusercontent.com
-Client Secret: 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

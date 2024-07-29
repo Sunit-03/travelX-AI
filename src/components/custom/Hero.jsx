@@ -12,6 +12,11 @@ function Hero() {
         <Link to={'/create-trip'}>
             <Button>Let's Get Started</Button>
         </Link>
+
+        <div className='grid grid-cols-2 my-10 px-5 object-cover'>
+            <img src="/Landing.jpg" className='mb-10'/>
+            <img src="/Trip.jpg" className='' />
+        </div>
     </div>
   )
 }
