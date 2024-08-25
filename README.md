@@ -44,3 +44,7 @@ NOTE: by default order is oldest to newest
 ## Google Authentication is also supported
 
 ![image](https://github.com/user-attachments/assets/7e93d7f6-4b22-454d-90c2-e923288ffb6c)
+
+
+### The project is hosted on vercel
+Link: https://travel-x-peach.vercel.app/
