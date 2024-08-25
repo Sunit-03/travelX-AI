@@ -1,4 +1,4 @@
-#TravelX: your personal AI based trip planner
+# TravelX: your personal AI based trip planner
 
 ## Landing Page:
 ![image](https://github.com/user-attachments/assets/f2b49a8c-7ff7-4937-b9dc-9a1bb1eb5cc0)
