@@ -7,8 +7,13 @@ import {
   } from "@/components/ui/popover"
 import { googleLogout, useGoogleLogin } from '@react-oauth/google'
 import { TbLogout2 } from "react-icons/tb";
-import { Dialog, DialogContent, DialogDescription } from '@radix-ui/react-dialog';
-import { DialogHeader } from '../ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '../ui/dialog';
 import { FcGoogle } from 'react-icons/fc';
 import axios from 'axios';
   
@@ -74,22 +79,22 @@ function Header() {
             </div>:<Button onClick={()=>setOpenDialog(true)}>Sign In</Button>
             }
         </div>
-        <Dialog open={openDialog}>
-        <DialogContent>
-          <DialogHeader>
+        <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="items-center text-center">
+            <img src="/Logo.png" width="170" height={50} alt="Logo" />
+            <DialogTitle className="text-lg font-bold mt-4">Sign in with Google</DialogTitle>
             <DialogDescription>
-              <img src="/Logo.png" width="170" height={50} />
-              <h2 className="font-bold text-lg mt-7">Sign in with google</h2>
-              <p>Sign in to the app with google auth</p>
-              <Button
-                onClick={login}
-                className="w-full mt-5 flex gap-4 items-center"
-              >
-                <FcGoogle className="h-5 w-5" />
-                Sign in with Google
-              </Button>
+              Sign in to the app with Google authentication
             </DialogDescription>
           </DialogHeader>
+          <Button
+            onClick={login}
+            className="w-full flex gap-4 items-center"
+          >
+            <FcGoogle className="h-5 w-5" />
+            Sign in with Google
+          </Button>
         </DialogContent>
         </Dialog>
     </div>

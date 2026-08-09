@@ -30,6 +30,9 @@ function CreateTrip() {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [formData, setFormData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
+  const [errorDialog, setErrorDialog] = React.useState(false);
+  const GENERATE_TRIP_TIMEOUT_MS = 45000;
+  const generationIdRef = React.useRef(0);
   const navigate = useNavigate()
   const handleInputChange = (name, value) => {
     setFormData({
@@ -68,10 +71,26 @@ function CreateTrip() {
     .replace("{budget}", formData?.budget)
     .replace("{totalDays}", formData?.noOfDays);
 
-    const result = await chatSession.sendMessage(FINAL_PROMPT);
-    console.log(result?.response?.text());
-    setLoading(false);
-    saveAiTrip(result?.response?.text())
+    const generationId = ++generationIdRef.current;
+    let timeoutId;
+    try {
+      const result = await Promise.race([
+        chatSession.sendMessage(FINAL_PROMPT),
+        new Promise((_, reject) => {
+          timeoutId = setTimeout(() => reject(new Error("timeout")), GENERATE_TRIP_TIMEOUT_MS);
+        }),
+      ]);
+      clearTimeout(timeoutId);
+      if (generationIdRef.current !== generationId) return; // superseded by a retry
+      console.log(result?.response?.text());
+      saveAiTrip(result?.response?.text());
+    } catch (error) {
+      clearTimeout(timeoutId);
+      console.error(error);
+      if (generationIdRef.current !== generationId) return;
+      setLoading(false);
+      setErrorDialog(true);
+    }
     };
   const saveAiTrip = async (tripDATA) => {
     setLoading(true);
@@ -177,22 +196,34 @@ function CreateTrip() {
         }
         </Button>
       </div>
-      <Dialog open={openDialog}>
-        <DialogContent>
-          <DialogHeader>
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="items-center text-center">
+            <img src="/Logo.png" width="170" height={50} alt="Logo" />
+            <DialogTitle className="text-lg font-bold mt-4">Sign in with Google</DialogTitle>
             <DialogDescription>
-              <img src="/Logo.png" width="170" height={50} />
-              <h2 className="font-bold text-lg mt-7">Sign in with google</h2>
-              <p>Sign in to the app with google auth</p>
-              <Button
-                onClick={login}
-                className="w-full mt-5 flex gap-4 items-center"
-              >
-                <FcGoogle className="h-5 w-5" />
-                Sign in with Google
-              </Button>
+              Sign in to the app with Google authentication
             </DialogDescription>
           </DialogHeader>
+          <Button
+            onClick={login}
+            className="w-full flex gap-4 items-center"
+          >
+            <FcGoogle className="h-5 w-5" />
+            Sign in with Google
+          </Button>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={errorDialog} onOpenChange={setErrorDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Trip generation failed</DialogTitle>
+            <DialogDescription>
+              We couldn't generate your trip in time. This can happen if the
+              AI service is slow or unavailable. Please try again.
+            </DialogDescription>
+          </DialogHeader>
+          <Button onClick={() => setErrorDialog(false)}>Close</Button>
         </DialogContent>
       </Dialog>
     </div>
